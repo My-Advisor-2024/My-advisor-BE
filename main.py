@@ -1,5 +1,7 @@
-from fastapi import FastAPI
+from PIL import Image
+from fastapi import FastAPI , Form, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
 
@@ -18,7 +20,12 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to the AI Prediction Service"}
+    return {"message": "Welcome to the My advisor"}
 
-# @app.post("/predict")
-# async def predict_img
+@app.post("/predict")
+async def predict(
+    gender: str = Form(...),
+    age: int = Form(...),
+    location: str = Form(...),
+    photo: UploadFile = File(...)
+):

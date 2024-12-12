@@ -7,7 +7,7 @@ app = FastAPI()
 
 # CORS 설정
 origins = [
-    "http://localhost:3000", 
+    "http://localhost:5500", 
 ]
 
 app.add_middleware(
@@ -29,3 +29,18 @@ async def predict(
     location: str = Form(...),
     photo: UploadFile = File(...)
 ):
+    # 이미지 검증
+    try:
+        img = Image.open(photo.file)
+        img.verify()  # 이미지가 유효한지 확인
+    except Exception:
+        return JSONResponse(
+            content={"error": "Invalid image file"}, status_code=400
+        )
+    
+    # Mock AI Prediction
+    prediction = f"Predicted condition for {location} is Skin Rash"
+
+    return JSONResponse(
+        content={"prediction": prediction}, status_code=200
+    )

@@ -1,7 +1,7 @@
-from PIL import Image
 from fastapi import FastAPI , Form, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from handler import preprocess_image, preprocess_metadata, predict_with_model
 
 app = FastAPI()
 
@@ -29,18 +29,23 @@ async def predict(
     location: str = Form(...),
     photo: UploadFile = File(...)
 ):
-    # 이미지 검증
     try:
-        img = Image.open(photo.file)
-        img.verify()  # 이미지가 유효한지 확인
-    except Exception:
-        return JSONResponse(
-            content={"error": "Invalid image file"}, status_code=400
-        )
-    
-    # Mock AI Prediction
-    prediction = f"Predicted condition for {location} is Skin Rash"
+        # 1. 이미지 전처리
+        input_image = preprocess_image(photo.file)
 
-    return JSONResponse(
-        content={"prediction": prediction}, status_code=200
-    )
+        # 2. 메타데이터 전처리
+        input_meta = preprocess_metadata(gender, age, location)
+
+        # 3. 모델 예측
+        prediction_result = predict_with_model(input_image, input_meta)
+
+        # 4. 결과 반환
+        return JSONResponse(
+            content=prediction_result,
+            status_code=200
+        )
+    except Exception as e:
+        return JSONResponse(
+            content={"error": str(e)},
+            status_code=400
+        )

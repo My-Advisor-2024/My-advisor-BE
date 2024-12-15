@@ -21,6 +21,7 @@ site_build
 venv
 docs.zip
 archive.zip
+assets/class_weight_model.h5
 
 # vim temporary files
 *~
